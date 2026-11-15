@@ -63,6 +63,26 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .toast{position:fixed;left:50%;top:calc(70px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--glass2);border:1px solid var(--line);
   padding:8px 14px;border-radius:12px;font-size:13px;pointer-events:none;transition:opacity .3s;max-width:calc(100% - 32px);text-align:center}
 .confirm{display:flex;gap:6px}
+.home{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:20;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px;
+  background:radial-gradient(ellipse at 50% 60%,rgba(8,16,30,.15),rgba(6,12,24,.75))}
+.home-card{width:min(380px,100%);display:flex;flex-direction:column;gap:10px;align-items:stretch;text-align:center;max-height:100%;overflow:auto}
+.home h1{margin:0;font-size:clamp(48px,13vw,76px);font-weight:800;letter-spacing:-.03em;line-height:1;
+  background:linear-gradient(180deg,#fff 20%,#ffd98a 75%,#ff9f5a);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 6px 24px rgba(255,170,90,.35))}
+.home .tag{margin:0 0 14px;color:var(--ink);font-size:15px;text-shadow:0 2px 10px rgba(0,0,0,.9)}
+.big{appearance:none;border:1px solid var(--line);background:var(--glass2);color:var(--ink);font:800 18px var(--font);padding:15px 18px;border-radius:16px;
+  cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;justify-content:center;align-items:baseline;gap:8px;transition:transform .12s}
+.big:hover{transform:translateY(-2px)} .big:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.big.primary{background:var(--accent);color:#06261b;border-color:transparent}
+.big small{font:600 12px var(--font);opacity:.75}
+.big:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.home .note{margin:0;color:var(--ink);text-shadow:0 1px 6px rgba(0,0,0,.9);font-size:12px;min-height:1em}
+.linkbtn{background:none;border:0;color:var(--mute);font:600 14px var(--font);cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:6px}
+.help{background:var(--glass2);border:1px solid var(--line);border-radius:16px;padding:12px 16px;text-align:left;font-size:13px;line-height:1.5;color:var(--mute)}
+.help b{color:var(--ink)} .help ul{margin:6px 0;padding-left:18px}
+body.at-home .hud, body.at-home .tray, body.at-home .card, body.at-home .menu{display:none!important}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
 @media (max-width:620px){.stat.hide-s{display:none}.tool{width:58px}.tool canvas{width:40px;height:35px}.card{bottom:calc(100px + env(safe-area-inset-bottom,0px))}}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
 </style>
@@ -80,8 +100,9 @@ input[type=range]{width:100%;accent-color:var(--accent)}
       <div><i id="dI" style="background:var(--ind)"></i></div>
     </div>
   </div>
+  <div class="pill" id="onlinePill" hidden><span class="dot"></span><div class="stat"><small id="onRole">Online</small><b id="onCount">1</b></div></div>
   <div class="spacer"></div>
-  <div class="speeds">
+  <div class="speeds" id="speeds">
     <button class="btn" data-speed="0" id="sp0" aria-label="Pausar">❚❚</button>
     <button class="btn on" data-speed="1" id="sp1" aria-label="Velocidade 1">▶</button>
     <button class="btn" data-speed="3" id="sp3" aria-label="Velocidade 2">▶▶</button>
@@ -94,8 +115,8 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   <h4>Prefeitura</h4>
   <div class="row"><span>Impostos</span><b id="taxV">9%</b></div>
   <input type="range" id="tax" min="0" max="20" value="9">
-  <div class="row"><span>Receita / mês</span><b id="incV">$0</b></div>
-  <div class="row"><span>Despesas / mês</span><b id="expV">$0</b></div>
+  <div class="row"><span>Receita / dia</span><b id="incV">$0</b></div>
+  <div class="row"><span>Despesas / dia</span><b id="expV">$0</b></div>
   <div class="row"><span>Energia usada</span><b id="powV">0 / 0</b></div>
   <div class="row"><span>Água usada</span><b id="watV">0 / 0</b></div>
   <div class="row"><span>Felicidade</span><b id="hapV">–</b></div>
@@ -112,6 +133,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   <div class="grid">
     <button class="btn" id="saveBtn">Salvar</button>
     <button class="btn" id="newBtn">Nova cidade</button>
+    <button class="btn" id="homeBtn" style="grid-column:span 2">Voltar ao início</button>
   </div>
   <div class="confirm" id="newConfirm" hidden>
     <button class="btn" id="newYes" style="flex:1;background:var(--warn);color:#2a0905">Apagar e recomeçar</button>
@@ -120,6 +142,27 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   <p style="margin:0;color:var(--mute);line-height:1.45">Dica: construa estradas, depois zonas ao lado delas. Toda zona precisa de <b style="color:var(--ink)">energia</b>; prédios maiores precisam de <b style="color:var(--ink)">água</b> e de serviços por perto. Use dois dedos (ou botão direito / roda do mouse) para mover e dar zoom.</p>
 </div>
 
+<div class="home" id="home">
+  <div class="home-card">
+    <h1>Horizonte</h1>
+    <p class="tag">Construa a sua cidade, quadra por quadra.</p>
+    <button class="big primary" id="hContinue" hidden>Continuar <small id="hContInfo"></small></button>
+    <button class="big" id="hNew">Novo jogo</button>
+    <button class="big" id="hOnline">Online <small>cidade compartilhada</small></button>
+    <p class="note" id="hNote"></p>
+    <button class="linkbtn" id="hHelp">Como jogar</button>
+    <div class="help" id="helpBox" hidden>
+      <ul>
+        <li>Faça <b>estradas</b> e pinte <b>zonas</b> ao lado delas: verde mora gente, azul é comércio, amarelo é indústria.</li>
+        <li>Nada cresce sem <b>energia</b>: construa uma usina perto. Prédios maiores pedem <b>água</b> e valor do solo alto.</li>
+        <li><b>Praças, escolas, hospitais, polícia e bombeiros</b> valorizam o bairro. Indústria polui, então deixe longe das casas.</li>
+        <li>Fique de olho nas barras de demanda (R, C, I) e no caixa. Um dia dura 10 minutos.</li>
+        <li>Celular: um dedo usa a ferramenta, dois dedos movem e dão zoom. Computador: botão direito arrasta, roda dá zoom.</li>
+        <li><b>Online</b>: todo mundo que abrir este link constrói a mesma cidade, ao vivo, com o mesmo caixa.</li>
+      </ul>
+    </div>
+  </div>
+</div>
 <div class="card" id="card" hidden></div>
 <div class="toast" id="toast" style="opacity:0"></div>
 
@@ -131,7 +174,9 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 const N = 64, HW = 32, HH = 16, RX = 45.25, RY = 22.63;
 const T = {NONE:0, ROAD:1, RES:2, COM:3, IND:4, POWER:5, WATER:6, PARK:7, SCHOOL:8, HOSP:9, POLICE:10, FIRE:11};
 const NAMES = ['Terreno','Estrada','Residencial','Comercial','Industrial','Usina elétrica','Caixa d’água','Praça','Escola','Hospital','Delegacia','Bombeiros'];
-const UPKEEP = [0,2,0,0,0,450,200,15,300,400,250,250];          // per month
+const UPKEEP = [0,2,0,0,0,380,170,12,250,330,210,210];          // per game day
+const DAY_SECONDS = 600;                                          // 1 game day = 10 real minutes at 1x
+const varFor=i=>(hash(i*7919+M.lvl[i]*131+(S?S.seed|0:0))*256)|0;
 const RADIUS = {5:14, 6:11, 7:4, 8:10, 9:12, 10:10, 11:10};
 const CAP = {5:700, 6:600};
 const POP = [0,10,42,140], CJOBS=[0,8,28,80], IJOBS=[0,14,34,70];
@@ -646,6 +691,10 @@ function render(){
   if(hover&&tool.id!=='hand'){const[x,y]=hover;const ok=canPlace(tool,x,y);
     if(tool.type&&RADIUS[tool.type]&&inb(x,y)){const r=RADIUS[tool.type];poly([[x-r,y-r,0.4],[x+r+1,y-r,0.4],[x+r+1,y+r+1,0.4],[x-r,y+r+1,0.4]],'rgba(120,200,255,0.12)');}
     diamond(x,y,0.5,ok?'rgba(255,255,255,0.35)':'rgba(255,80,80,0.4)',0);}
+  if(MODE==='online')for(const p of ON.peers){const pr=p.presence||{};if(p.isMe||pr.x==null||!inb(pr.x,pr.y))continue;
+    const hue=(hash([...p.peer].reduce((a,c)=>a*31+c.charCodeAt(0)|0,7))*360)|0;
+    diamond(pr.x,pr.y,0.6,'hsla('+hue+',90%,60%,0.45)',0);
+    const a=S3(pr.x+0.5,pr.y+0.5,30);g.fillStyle='hsl('+hue+',90%,62%)';g.beginPath();g.moveTo(a[0],a[1]+10);g.lineTo(a[0]-6,a[1]);g.lineTo(a[0]+6,a[1]);g.closePath();g.fill();}
   // objects
   const carMap=new Map();for(const c of cars){const p=carPos(c);const k=idx(Math.floor(p[0]),Math.floor(p[1]));(carMap.get(k)||carMap.set(k,[]).get(k)).push(c);}
   lights.length=0;warnIcons.length=0;
@@ -715,16 +764,16 @@ function simTick(){
     if(!rd||(!pw&&l>0)||d<-0.45){ if(l>0&&Math.random()<(rd&&pw?0.03:0.06)){M.lvl[i]--;dirty=true;} continue;}
     if(!pw)continue;
     if(t===T.RES&&M.poll[i]>0.55&&l>=1){if(Math.random()<0.03){M.lvl[i]--;dirty=true;}continue;}
-    if(l===0&&d>0&&Math.random()<0.12*d+0.03){M.lvl[i]=1;M.vari[i]=(Math.random()*256)|0;dirty=true;}
-    else if(l===1&&d>0.05&&wt&&lv>=(t===T.IND?0.1:0.28)&&Math.random()<0.035*d+0.005){M.lvl[i]=2;M.vari[i]=(Math.random()*256)|0;dirty=true;}
-    else if(l===2&&d>0.1&&wt&&lv>=(t===T.IND?0.2:0.5)&&S.pop>(t===T.RES?500:900)&&Math.random()<0.015*d){M.lvl[i]=3;M.vari[i]=(Math.random()*256)|0;dirty=true;}
+    if(l===0&&d>0&&Math.random()<0.12*d+0.03){M.lvl[i]=1;M.vari[i]=varFor(i);dirty=true;}
+    else if(l===1&&d>0.05&&wt&&lv>=(t===T.IND?0.1:0.28)&&Math.random()<0.035*d+0.005){M.lvl[i]=2;M.vari[i]=varFor(i);dirty=true;}
+    else if(l===2&&d>0.1&&wt&&lv>=(t===T.IND?0.2:0.5)&&S.pop>(t===T.RES?500:900)&&Math.random()<0.015*d){M.lvl[i]=3;M.vari[i]=varFor(i);dirty=true;}
   }
   stats();
 }
-function daily(){
-  const income=(S.pop*0.55+(S.cjobs+S.ijobs)*0.45)*S.tax/100*2.2;
-  const exp=S.upkeep/30;
-  S.money+=income-exp; S.monthInc=income*30; S.monthExp=S.upkeep;
+function incomePerDay(){return (S.pop*0.55+(S.cjobs+S.ijobs)*0.45)*S.tax/100*55;}
+function econ(realSec){ // money flows continuously; returns the change
+  const inc=incomePerDay(), exp=S.upkeep||0; S.monthInc=inc; S.monthExp=exp;
+  return (inc-exp)*realSec/DAY_SECONDS;
 }
 
 // ======================= TOOLS =======================
@@ -742,10 +791,12 @@ function apply(tl,x,y,silent){
   const i=idx(x,y);
   let cost=tl.cost+(M.tree[i]&&tl.id!=='tree'?5:0);
   if(S.money<cost){if(!silent)toast('Dinheiro insuficiente');return false;}
+  if(MODE==='online'){if(!ON.canWrite){if(!silent)toast('Você só pode ver esta cidade');return false;}ON.mySpend+=cost;}
   S.money-=cost;
   if(tl.id==='doze'){M.type[i]=0;M.lvl[i]=0;M.tree[i]=0;}
   else if(tl.id==='tree'){M.tree[i]=1+((Math.random()*6)|0);}
-  else{M.type[i]=tl.type;M.lvl[i]=0;M.tree[i]=0;M.vari[i]=(Math.random()*256)|0;}
+  else{M.type[i]=tl.type;M.lvl[i]=0;M.tree[i]=0;M.vari[i]=varFor(i);}
+  if(MODE==='online')ON.queue.set(i,{t:M.type[i],tr:M.tree[i]});
   dirty=true;return true;
 }
 function lineTiles(a,b,fn){let[x0,y0]=a;const[x1,y1]=b;const dx=Math.abs(x1-x0),dy=Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let e=dx-dy;
@@ -827,16 +878,16 @@ function buildTools(){
   selectTool(tool);
 }
 function selectTool(tl){tool=tl;document.querySelectorAll('.tool').forEach(b=>b.classList.toggle('sel',b.id==='tool-'+tl.id));cv.style.cursor=tl.id==='hand'?'grab':'crosshair';if(tl.id!=='hand')$('card').hidden=true;}
-function setSpeed(s){S.speed=s;[0,1,3,8].forEach(v=>$('sp'+v).classList.toggle('on',v===s));}
+function setSpeed(s){if(MODE==='online')s=1;S.speed=s;[0,1,3,8].forEach(v=>$('sp'+v).classList.toggle('on',v===s));}
 document.querySelectorAll('[data-speed]').forEach(b=>b.onclick=()=>setSpeed(+b.dataset.speed));
 document.querySelectorAll('[data-ov]').forEach(b=>b.onclick=()=>{overlay=+b.dataset.ov;document.querySelectorAll('[data-ov]').forEach(o=>o.classList.toggle('on',o===b));});
 $('menuBtn').onclick=()=>{const m=$('menu');m.hidden=!m.hidden;$('newConfirm').hidden=true;};
 function closeMenu(){$('menu').hidden=true;}
-$('tax').oninput=e=>{S.tax=+e.target.value;stats();};
-$('saveBtn').onclick=()=>{toast(save()?'Cidade salva neste navegador':'Não foi possível salvar aqui');};
+$('tax').oninput=e=>{S.tax=+e.target.value;stats();if(MODE==='online')ON.taxDirty=true;};
+$('saveBtn').onclick=()=>{if(MODE==='online'){toast('A cidade online salva sozinha');return;}toast(save()?'Cidade salva neste navegador':'Não foi possível salvar aqui');};
 $('newBtn').onclick=()=>{$('newConfirm').hidden=false;};
 $('newNo').onclick=()=>{$('newConfirm').hidden=true;};
-$('newYes').onclick=()=>{newCity();recompute();stats();closeMenu();$('tax').value=S.tax;toast('Nova cidade criada');};
+$('newYes').onclick=()=>{if(MODE==='online'){toast('A cidade online não pode ser apagada daqui');return;}newCity();recompute();stats();closeMenu();$('tax').value=S.tax;toast('Nova cidade criada');};
 $('nightBtn').onclick=()=>{const h=S.time%24;S.time+= (h<20?20-h:44-h);};
 function inspect(x,y){
   const card=$('card');if(!inb(x,y)){card.hidden=true;return;}const i=idx(x,y),t=M.type[i],l=M.lvl[i];
@@ -846,7 +897,7 @@ function inspect(x,y){
   if(t>=T.RES&&t<=T.IND){rows+=row('Tipo',sub[t][l]);if(t===T.RES)rows+=row('Moradores',POP[l]);else rows+=row('Empregos',t===T.COM?CJOBS[l]:IJOBS[l]);}
   if(t>=T.RES&&t!==T.PARK){rows+=row('Energia',M.power[i]?'Sim':'<span style="color:var(--warn)">Não</span>');rows+=row('Água',M.water[i]?'Sim':'<span style="color:var(--warn)">Não</span>');}
   if(t>=T.RES&&t<=T.IND)rows+=row('Acesso à estrada',M.road[i]?'Sim':'<span style="color:var(--warn)">Não</span>');
-  if(UPKEEP[t])rows+=row('Manutenção',fmt(UPKEEP[t])+'/mês');
+  if(UPKEEP[t])rows+=row('Manutenção',fmt(UPKEEP[t])+'/dia');
   rows+=row('Valor do solo',Math.round(M.land[i]*100)+'%')+`<div class="bar"><i style="width:${M.land[i]*100}%;background:var(--accent)"></i></div>`;
   rows+=row('Poluição',Math.round(M.poll[i]*100)+'%')+`<div class="bar"><i style="width:${M.poll[i]*100}%;background:#b0784a"></i></div>`;
   card.innerHTML=`<button class="x" aria-label="Fechar" onclick="this.parentNode.hidden=true">×</button><h3>${title}</h3>${rows}`;card.hidden=false;
@@ -878,32 +929,173 @@ function deserialize(d){
 function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(serialize()));return true;}catch(e){return false;}}
 function load(){try{const s=localStorage.getItem(SAVE_KEY);if(s)return deserialize(JSON.parse(s));}catch(e){}return false;}
 
+// ======================= ONLINE =======================
+let MODE='demo';
+const ON={active:false,db:null,room:null,host:false,tab:'t'+Math.random().toString(36).slice(2,10),earned:0,spends:{},mySpend:0,spendWritten:0,
+  queue:new Map(),flushing:false,metaBusy:false,spendBusy:false,metaAcc:0,spendAcc:0,flushAcc:0,presAcc:0,lastPres:'',unsubs:[],peers:[],ready:false,
+  canWrite:true,baseTree:null,lastLv:'',tiles:new Map(),metaMissing:false,creating:false,hostTimer:0,taxDirty:false};
+let dbP=null,roomP=null,userP=null;
+const useCap=n=>(window.claude&&typeof window.claude.use==='function')?window.claude.use(n).catch(()=>null):Promise.resolve(null);
+function getDb(){return dbP||(dbP=useCap('db'));}
+async function startOnline(){
+  const note=$('hNote');note.textContent='Conectando à cidade online…';$('hOnline').disabled=true;
+  const db=await getDb();
+  if(!db){note.textContent='O modo online só funciona abrindo o jogo pelo link do Claude, com sua conta.';$('hOnline').disabled=false;return;}
+  Object.assign(ON,{active:true,db,host:false,ready:false,earned:0,spends:{},mySpend:0,spendWritten:0,peers:[],unsubs:[],tiles:new Map(),queue:new Map(),
+    metaMissing:false,creating:false,canWrite:true,lastLv:'',taxDirty:false});
+  MODE='online';
+  userP=userP||useCap('user');const user=await userP;
+  if(user){const w=await user.can('data.write');if(w===false)ON.canWrite=false;}
+  const timeout=setTimeout(()=>{if(!ON.ready&&ON.active)note.textContent='Ainda conectando… a conexão está lenta.';},10000);
+  ON.unsubs.push(db.doc('online/meta').onSnapshot(snap=>{
+    if(!snap.exists){if(!snap.metadata.fromCache){ON.metaMissing=true;if(ON.host)createMeta();else tryHost();}
+      if(!ON.canWrite&&!snap.metadata.fromCache)note.textContent='A cidade online ainda não foi criada pelo dono do jogo.';return;}
+    ON.metaMissing=false;const d=snap.data();
+    if(!ON.ready){clearTimeout(timeout);initOnlineMap(d);}
+    applyMeta(d);
+  },e=>{note.textContent='Não deu para abrir a cidade online agora.';$('hOnline').disabled=false;leaveOnline();MODE='demo';}));
+  ON.unsubs.push(db.collection('tiles').onSnapshot(snap=>{
+    for(const ch of snap.docChanges()){const i=+ch.doc.id;if(!(i>=0&&i<N*N))continue;
+      if(ch.type==='removed')ON.tiles.delete(i);else ON.tiles.set(i,ch.doc.data());if(ON.ready)applyTile(i);}
+  },()=>{}));
+  ON.unsubs.push(db.collection('spend').onSnapshot(snap=>{for(const d of snap.docs){if(d.id!==ON.tab)ON.spends[d.id]=+(d.data().s)||0;}},()=>{}));
+  tryHost();ON.hostTimer=setInterval(tryHost,5000);
+  roomP=roomP||useCap('room');roomP.then(room=>{if(!room||!ON.active)return;ON.room=room;
+    ON.unsubs.push(room.onPeers(ch=>{ON.peers=ch.peers.slice();},()=>{}));});
+}
+async function createMeta(){
+  if(ON.creating)return;ON.creating=true;
+  try{await ON.db.doc('online/meta').set({seed:(Math.random()*1e9)|0,time:8,earned:30000,tax:9,lv:'',pop:0});}catch(e){ON.creating=false;}
+}
+async function tryHost(){
+  if(!ON.active||!ON.canWrite)return;
+  try{const r=await ON.db.doc('online/host').acquire({holder:ON.tab,ttlMs:15000});
+    if(!ON.active)return;
+    const was=ON.host;ON.host=!!r.acquired;
+    if(ON.host&&ON.metaMissing)createMeta();
+    if(ON.host&&!was&&ON.ready)toast('Você virou o prefeito: a cidade cresce pelo seu aparelho');
+  }catch(e){if(e&&e.code==='invalid_argument')ON.canWrite=false;}
+}
+function initOnlineMap(d){
+  newCity(d.seed);ON.baseTree=M.tree.slice();S.speed=1;S.time=d.time||8;S.tax=d.tax??9;ON.earned=d.earned??30000;
+  for(const i of ON.tiles.keys())applyTile(i);
+  ON.ready=true;
+  if(d.lv){ON.lastLv='';applyMeta(d);}
+  recompute();stats();enterGame();
+  toast(ON.canWrite?'Cidade online: tudo que você construir aparece para todos':'Você está só olhando esta cidade');
+}
+function applyMeta(d){
+  if(!ON.host){ON.earned=+d.earned||0;if(Math.abs((d.time||0)-S.time)>0.05)S.time=d.time||S.time;}
+  if(!ON.taxDirty&&d.tax!=null&&d.tax!==S.tax){S.tax=d.tax;$('tax').value=S.tax;}
+  if(!ON.host&&d.lv&&d.lv!==ON.lastLv){ON.lastLv=d.lv;let lv;try{lv=unb64(d.lv);}catch(e){return;}
+    for(let i=0;i<N*N&&i<lv.length;i++){const t=M.type[i];if(t>=T.RES&&t<=T.IND&&M.lvl[i]!==lv[i]){M.lvl[i]=lv[i];M.vari[i]=varFor(i);dirty=true;}}}
+}
+function applyTile(i){
+  if(ON.queue.has(i)||M.terrain[i]===0)return;
+  const d=ON.tiles.get(i);const t=d?(+d.t||0):0,tr=d?(+d.tr||0):ON.baseTree[i];
+  if(M.type[i]!==t){M.type[i]=t;M.lvl[i]=0;M.vari[i]=varFor(i);dirty=true;}
+  if(M.tree[i]!==tr){M.tree[i]=tr;dirty=true;}
+}
+async function flushTiles(){
+  if(ON.flushing||!ON.queue.size)return;ON.flushing=true;
+  const batch=[...ON.queue.entries()].slice(0,25);
+  try{await Promise.all(batch.map(([i,v])=>ON.db.doc('tiles/'+i).set(v)));
+    for(const[i,v]of batch){const q=ON.queue.get(i);if(q&&q.t===v.t&&q.tr===v.tr)ON.queue.delete(i);}
+  }catch(e){if(e&&e.code==='invalid_argument'){ON.canWrite=false;ON.queue.clear();toast('Você só pode ver esta cidade');}
+    else if(e&&e.code==='quota_exceeded'){toast('A cidade online atingiu o limite de espaço');ON.queue.clear();}}
+  ON.flushing=false;
+}
+async function writeSpend(){if(ON.spendBusy||ON.mySpend===ON.spendWritten)return;ON.spendBusy=true;const v=ON.mySpend;
+  try{await ON.db.doc('spend/'+ON.tab).set({s:v});ON.spendWritten=v;}catch(e){}ON.spendBusy=false;}
+async function writeMeta(){if(ON.metaBusy)return;ON.metaBusy=true;
+  try{const lv=b64(M.lvl);const body={time:S.time,earned:ON.earned,pop:S.pop};if(lv!==ON.lastLv)body.lv=lv;
+    await ON.db.doc('online/meta').update(body);ON.lastLv=lv;}catch(e){}ON.metaBusy=false;}
+async function writeTax(){ON.taxDirty=false;const v=S.tax;try{await ON.db.doc('online/meta').update({tax:v});}catch(e){}}
+function onlineTick(dt){
+  if(!ON.active||!ON.ready)return;
+  ON.flushAcc+=dt;if(ON.flushAcc>0.3){ON.flushAcc=0;flushTiles();}
+  ON.spendAcc+=dt;if(ON.spendAcc>1.5){ON.spendAcc=0;writeSpend();if(ON.taxDirty)writeTax();}
+  if(ON.host){ON.metaAcc+=dt;if(ON.metaAcc>4){ON.metaAcc=0;writeMeta();}}
+  if(ON.room){ON.presAcc+=dt;if(ON.presAcc>0.35){ON.presAcc=0;const k=hover?hover.join(','):'';if(k!==ON.lastPres){ON.lastPres=k;
+    ON.room.presence(hover&&inb(hover[0],hover[1])?{x:hover[0],y:hover[1]}:{x:null,y:null}).catch(()=>{});}}}
+  let others=0;for(const k in ON.spends)others+=ON.spends[k];
+  S.money=ON.earned-others-ON.mySpend;
+  $('onCount').textContent=(Math.max(1,ON.peers.length))+(ON.peers.length>1?' jogadores':' jogador');
+  $('onRole').textContent=ON.canWrite?(ON.host?'Online · prefeito':'Online'):'Online · só olhando';
+}
+function leaveOnline(){
+  if(!ON.active)return;
+  for(const u of ON.unsubs)try{u();}catch(e){}
+  ON.unsubs=[];clearInterval(ON.hostTimer);
+  if(ON.room)ON.room.presence({x:null,y:null}).catch(()=>{});
+  if(ON.ready){ON.queue.size&&flushTiles();writeSpend();if(ON.host)writeMeta();}
+  ON.active=false;ON.host=false;ON.ready=false;ON.room=null;ON.peers=[];
+}
+
+// ======================= HOME / MODES =======================
+function buildDemo(){
+  newCity(424242);MODE='demo';
+  const c=N/2|0;S.money=1e9;
+  const tl=id=>TOOLS.find(t=>t.id===id);
+  for(let k=-11;k<=11;k++)for(const o of[-6,0,6]){apply(tl('road'),c+k,c+o,1);apply(tl('road'),c+o,c+k,1);}
+  for(let x=c-11;x<=c+11;x++)for(let y=c-11;y<=c+11;y++){const z=(y<c)?(x<c-3?'res':x<c+4?'com':'res'):(x<c?'res':'ind');apply(tl(z),x,y,1);}
+  apply(tl('power'),c+13,c+9,1);apply(tl('power'),c-13,c+9,1);apply(tl('water'),c+13,c-3,1);apply(tl('water'),c-13,c-3,1);apply(tl('water'),c,c-13,1);
+  apply(tl('park'),c-3,c-3,1);apply(tl('park'),c+3,c+3,1);apply(tl('school'),c-9,c-13,1);apply(tl('hosp'),c+9,c-13,1);apply(tl('police'),c-13,c-9,1);apply(tl('fire'),c+13,c-9,1);
+  recompute();for(let k=0;k<600;k++)simTick();
+  for(let i=0;i<N*N;i++){const t=M.type[i];if(t>=T.RES&&t<=T.IND&&M.road[i]){const x=i%N,y=(i/N)|0,d=Math.hypot(x-c,y-c);
+    const r=hash(i*13);M.lvl[i]=d<5&&r<0.7?3:d<9&&r<0.75?2:1;M.vari[i]=varFor(i);}}
+  dirty=true;recompute();stats();
+  S.time=15.5;S.speed=3;cam.zoom=innerWidth<700?0.8:1.1;cam.x=0;cam.y=c*32;
+}
+function showHome(){
+  if(MODE==='solo')save();
+  if(MODE==='online')leaveOnline();
+  document.body.classList.add('at-home');$('home').hidden=false;$('hNote').textContent='';$('hOnline').disabled=false;
+  let info=null;try{const sv=localStorage.getItem(SAVE_KEY);if(sv){const d=JSON.parse(sv);info=d.S;}}catch(e){}
+  $('hContinue').hidden=!info;if(info){$('hContInfo').textContent=(info.pop||0).toLocaleString('pt-BR')+' habitantes';}
+  $('hNew').classList.toggle('primary',!info);
+  buildDemo();
+  getDb().then(db=>{if(!db&&MODE==='demo')$('hNote').textContent='O modo online funciona quando o jogo é aberto pelo link do Claude.';});
+}
+function enterGame(){document.body.classList.remove('at-home');$('home').hidden=true;$('card').hidden=true;
+  $('onlinePill').hidden=MODE!=='online';$('speeds').style.visibility=MODE==='online'?'hidden':'visible';
+  $('tax').value=S.tax;setSpeed(MODE==='online'?1:(S.speed||1));selectTool(TOOLS[0]);}
+$('hContinue').onclick=()=>{if(load()){MODE='solo';enterGame();toast('Bem-vindo de volta!');}};
+$('hNew').onclick=()=>{newCity();MODE='solo';recompute();stats();save();enterGame();toast('Comece com estradas, zonas e uma usina.');};
+$('hOnline').onclick=()=>startOnline();
+$('hHelp').onclick=()=>{$('helpBox').hidden=!$('helpBox').hidden;};
+$('homeBtn').onclick=()=>{closeMenu();showHome();};
+
 // ======================= LOOP =======================
 let last=performance.now(), simAcc=0, saveAcc=0;
 function frame(now){
   const dt=Math.min(0.1,(now-last)/1000);last=now;nowT+=dt;
-  // keyboard pan
   const kp=600*dt/cam.zoom;if(keys['w']||keys['arrowup'])cam.y-=kp;if(keys['s']||keys['arrowdown'])cam.y+=kp;if(keys['a']||keys['arrowleft'])cam.x-=kp;if(keys['d']||keys['arrowright'])cam.x+=kp;
-  if(S.speed>0){
-    const hours=dt*S.speed; const before=Math.floor(S.time/24); S.time+=hours; simAcc+=hours;
-    while(simAcc>=0.5){simAcc-=0.5;simTick();}
-    const after=Math.floor(S.time/24); for(let d=before;d<after;d++)daily();
+  if(MODE==='demo'){cam.x=Math.sin(nowT*0.05)*260;cam.y=N*HH+Math.cos(nowT*0.037)*120;}
+  const alive=MODE!=='online'||ON.ready, runSim=MODE!=='online'||ON.host;
+  if(S.speed>0&&alive){
+    const rs=dt*S.speed;
+    S.time+=rs*24/DAY_SECONDS*(MODE==='demo'?4:1);
+    simAcc+=rs;
+    while(simAcc>=0.5){simAcc-=0.5;if(runSim)simTick();else{if(dirty)recompute();stats();}}
+    const dm=econ(rs);
+    if(MODE==='online'){if(ON.host)ON.earned+=dm;}else if(MODE==='solo')S.money+=dm;
     updateCars(dt*Math.min(S.speed,3)); updateParts(dt);
-  } else if(dirty){recompute();stats();}
-  saveAcc+=dt;if(saveAcc>20){saveAcc=0;save();}
+  } else if(dirty&&alive){recompute();stats();}
+  if(MODE==='online')onlineTick(dt);
+  if(MODE==='solo'){saveAcc+=dt;if(saveAcc>20){saveAcc=0;save();}}
   render();
   uiT+=dt;if(uiT>0.2){uiT=0;updateUI();}
   requestAnimationFrame(frame);
 }
 function start(data){
-  resize();
-  if(!(data&&data.city&&deserialize(data.city))&&!load()){newCity();recompute();stats();
-    // starter: a little road so the map shows what to do
-    toast('Bem-vindo! Construa estradas, zonas e uma usina.');}
-  $('tax').value=S.tax;setSpeed(S.speed??1);
-  buildTools();updateUI();requestAnimationFrame(frame);
+  resize();buildTools();
+  if(data&&data.mode==='solo'&&data.city&&deserialize(data.city)){MODE='solo';enterGame();}
+  else showHome();
+  updateUI();requestAnimationFrame(frame);
 }
-window.claude?.hot?.snapshot?.(()=>({city:serialize()}));
+addEventListener('pagehide',()=>{if(MODE==='solo')save();if(MODE==='online')leaveOnline();});
+window.claude?.hot?.snapshot?.(()=>MODE==='solo'?{mode:'solo',city:serialize()}:{});
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
 </script>
 
