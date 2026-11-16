@@ -15,4 +15,14 @@ O modo online usa a capacidade `room` dos Artifacts do Claude (só funciona pelo
 
 Controles: WASD/setas, E usa, R reporta, Q elimina, V tubulação. No celular, arraste no lado esquerdo da tela.
 
-`game.html` é a fonte; rode `./build.sh` para gerar `index.html`.
+`game.html` é a fonte; rode `./build.sh` para gerar `index.html` (versão do Claude).
+
+## queres.games
+
+`./build-site.sh` gera `site/`, a versão para o queres.games:
+- fontes guardadas em `fonts/` (sem Google Fonts);
+- conta do site (`/conta.js`) com o apelido como nome;
+- **sem chat**;
+- online pelo servidor `servidor/worker-infiltrados/` (Cloudflare Worker), por onde só passam números.
+
+Como publicar: `PUBLICAR-QUERES-GAMES.md`. Capa do card: `capa/infiltrados.webp`.

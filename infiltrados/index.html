@@ -59,6 +59,8 @@ input{font:inherit;color:var(--fg);background:#0a1020;border:1px solid var(--lin
 .how ul{padding-left:18px;color:#c7d1ec;line-height:1.55;font-size:15px}
 .how li{margin-bottom:6px}
 .earn{font-family:var(--fd);font-weight:700;color:var(--gold);font-size:clamp(18px,4vw,24px)}
+.acct{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:10px 14px}
+.acct span{font-weight:800;min-width:0}
 .how kbd{font-family:var(--fd);background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:12px}
 @media (max-width:420px){.row2{grid-template-columns:1fr}}
 
@@ -176,16 +178,16 @@ input[type=range]{width:100%;accent-color:var(--gold);min-height:32px;padding:0;
 .pcard.dead{opacity:.45}
 .pcard .stamp{position:absolute;right:6px;top:6px;font-family:var(--fd);font-size:10px;letter-spacing:.08em;background:var(--ok);color:#052012;border-radius:6px;padding:2px 5px}
 .pcard .meflag{color:var(--gold)}
-.chat{display:flex;flex-direction:column;min-height:0;border:1px solid var(--line);border-radius:14px;background:#0a1020;overflow:hidden}
-#chatLog{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px;font-size:14px;min-height:120px}
-#chatLog .msg b{margin-right:6px}
-#chatLog .msg.ghost{opacity:.6;font-style:italic}
-#chatLog .sys{color:var(--mut);font-size:12px;text-align:center}
+.mlog{display:flex;flex-direction:column;min-height:0;border:1px solid var(--line);border-radius:14px;background:#0a1020;overflow:hidden}
+#meetLog{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px;font-size:14px;min-height:120px}
+#meetLog .msg b{margin-right:6px}
+#meetLog .msg.ghost{opacity:.6;font-style:italic}
+#meetLog .sys{color:var(--mut);font-size:12px;text-align:center}
 #chatForm{display:flex;gap:6px;padding:8px;border-top:1px solid var(--line)}
 #chatForm input{flex:1;min-height:40px;padding:8px 10px;font-size:14px}
 #chatForm button{min-height:40px}
 .meet-card>footer{display:flex;justify-content:flex-end;gap:10px;padding:12px 16px;flex-wrap:wrap}
-@media (max-width:700px){.meet-main{grid-template-columns:1fr;overflow-y:auto}.chat{min-height:180px}#mtGrid{grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible}}
+@media (max-width:700px){.meet-main{grid-template-columns:1fr;overflow-y:auto}.mlog{min-height:180px}#mtGrid{grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible}}
 
 #splash{flex-direction:column;gap:14px;text-align:center;background:rgba(3,5,12,.92)}
 #splash h2{font-family:var(--fd);font-size:clamp(30px,8vw,64px);margin:0;letter-spacing:.06em;text-wrap:balance}
@@ -252,7 +254,8 @@ input[type=range]{width:100%;accent-color:var(--gold);min-height:32px;padding:0;
         <h1>Infiltrados<br><span>na Órbita</span></h1>
       </div>
     </header>
-    <label class="fld"><span>Seu nome na tripulação</span><input id="nm" maxlength="12" autocomplete="off" spellcheck="false" placeholder="Seu apelido"></label>
+    <div class="acct" id="acctBox" hidden><span id="acctTxt">Conta do queres.games</span><button class="btn small" id="bConta">Entrar na conta</button></div>
+    <label class="fld" id="fldName"><span>Seu nome na tripulação</span><input id="nm" maxlength="12" autocomplete="off" spellcheck="false" placeholder="Seu apelido"></label>
     <div class="row2">
       <button class="btn primary" id="bCreate">Criar sala<small>gera um código de 4 letras</small></button>
       <div class="joinbox">
@@ -265,12 +268,12 @@ input[type=range]{width:100%;accent-color:var(--gold);min-height:32px;padding:0;
       <button class="btn" id="bShop">Loja de roupas<small id="homeCoins">150 créditos</small></button>
     </div>
     <p class="note" id="note" role="status"></p>
-    <section class="rooms">
+    <section class="rooms" id="roomsSec">
       <h2>Salas abertas agora</h2>
       <div id="roomList"><p class="empty">Procurando salas…</p></div>
     </section>
-    <details class="how">
-      <summary>Como jogar</summary>
+    <details class="how" id="howBox">
+      <summary id="howSum">Como jogar</summary>
       <ul>
         <li><b>Criar sala</b> gera um código como <b>K7QM</b>. Passe o código para os amigos; eles digitam e tocam em <b>Entrar</b>.</li>
         <li>Quando todos estiverem no refeitório, o anfitrião (quem tem a coroa) escolhe quantos infiltrados e toca em <b>Iniciar</b>. Dá para completar a sala com robôs.</li>
@@ -341,9 +344,9 @@ input[type=range]{width:100%;accent-color:var(--gold);min-height:32px;padding:0;
     <p id="mtHint"></p>
     <div class="meet-main">
       <div id="mtGrid"></div>
-      <div class="chat">
-        <div id="chatLog" aria-live="polite"></div>
-        <form id="chatForm" autocomplete="off"><input id="chatIn" maxlength="90" placeholder="Escreva para a tripulação…" aria-label="Mensagem"><button class="btn small">Enviar</button></form>
+      <div class="mlog">
+        <div id="meetLog" aria-live="polite"></div>
+        <form id="chatForm" autocomplete="off"><input id="chatIn" maxlength="90" placeholder="Escreva para a tripulação…" aria-label="Mensagem"><button class="btn small" id="bChatSend">Enviar</button></form>
       </div>
     </div>
     <footer><button class="btn" id="bSkip">Pular voto</button><button class="btn primary" id="bVote" disabled>Votar</button></footer>
@@ -460,6 +463,7 @@ function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 
 // ======================= SOM =======================
 let AC=null;
+document.addEventListener('visibilitychange',()=>{if(!AC)return;if(document.hidden)AC.suspend().catch(()=>{});else AC.resume().catch(()=>{});});
 function audioOn(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(AC&&AC.state==='suspended')AC.resume().catch(()=>{});}
 function tone(f,d,type='sine',v=.12,when=0,f2){if(!AC)return;const t=AC.currentTime+when,o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);
   g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d+.02);}
@@ -534,7 +538,124 @@ let roomP=null;
 const useCap=n=>(window.claude&&typeof window.claude.use==='function')?window.claude.use(n).catch(()=>null):Promise.resolve(null);
 function getRoom(){return roomP||(roomP=useCap('room'));}
 let lobbyPeers=[],lobbyUnsub=null;
+// ======================= SITE queres.games =======================
+// No queres.games: login pela conta do site (apelido), sem chat e só NÚMEROS pela rede.
+const SITE=window.QG_SITE===true;
+let SITE_NAME='';
+async function siteConta(abrir){
+  if(!window.QGConta){return null;}
+  let eu=null;try{eu=await window.QGConta.me();}catch(e){}
+  if(eu&&!eu.logado&&abrir){try{const r=await window.QGConta.entrar();if(r&&r.apelido)eu={logado:true,apelido:r.apelido};}catch(e){}}
+  SITE_NAME=eu&&eu.logado?eu.apelido:'';
+  if(SITE){$('acctTxt').textContent=SITE_NAME?'Você é '+SITE_NAME:'Entre na conta do site para jogar online';$('bConta').textContent=SITE_NAME?'Minha conta':'Entrar na conta';}
+  return eu;
+}
+function onlineBase(){
+  const q=new URLSearchParams(location.search).get('online');
+  if(q&&/^wss?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//.test(q))return q.replace(/\/$/,'');
+  return(location.protocol==='https:'?'wss':'ws')+'://'+location.host+'/online/infiltrados';
+}
+// ids na rede: jogador 'p7' -> 7, robô 'bot3' -> 1003
+const idNum=id=>typeof id!=='string'?-1:id.startsWith('bot')?1000+(parseInt(id.slice(3),10)||0):id.startsWith('p')?(parseInt(id.slice(1),10)||-1):-1;
+const numId=n=>typeof n!=='number'||n<=0?null:n>=1000?'bot'+(n-1000):'p'+n;
+const PHS=['lobby','play','meet','eject','end'],TYK=Object.keys(TYPES),ACTS=['kill','rep','btn','task'];
+const WHY=['Todos os infiltrados foram descobertos.','Os infiltrados tomaram a estação.','Todas as tarefas foram concluídas.'];
+const N=v=>typeof v==='number'&&isFinite(v)?Math.round(v):0;
+const pairs=o=>Object.entries(o||{}).map(([k,v])=>[idNum(k),N(v)]);
+const unpairs=a=>{const o={};for(const e of a||[]){const k=numId(e[0]);if(k)o[k]=N(e[1]);}return o;};
+const ids=a=>(a||[]).map(idNum);const unids=a=>(a||[]).map(numId).filter(Boolean);
+function encodePres(p){return[N(p.c),N(p.x),N(p.y),p.f===-1?-1:1,p.m?1:0,p.el?1:0,packOutfit(p.o),p.sk?idNum(p.sk):-1,
+  Array.isArray(p.vt)?[N(p.vt[0]),p.vt[1]==='s'?-2:idNum(p.vt[1])]:[],(p.a||[]).map(a=>[N(a.s),ACTS.indexOf(a.t),a.p?idNum(a.p):-1,a.k==null?-1:N(a.k)])];}
+function decodePres(d,name){if(!Array.isArray(d))return null;const vt=Array.isArray(d[8])&&d[8].length===2?[d[8][0],d[8][1]===-2?'s':numId(d[8][1])]:null;
+  return{n:name||'Tripulante',c:N(d[0]),x:N(d[1]),y:N(d[2]),f:d[3]===-1?-1:1,m:d[4]?1:0,el:d[5]?1:0,o:cleanOutfit(d[6]),sk:numId(d[7]),vt,ch:[],
+    a:(Array.isArray(d[9])?d[9]:[]).filter(Array.isArray).map(a=>{const o={s:N(a[0]),t:ACTS[a[1]]||'x'};const p=numId(a[2]);if(p)o.p=p;if(a[3]>=0)o.k=N(a[3]);return o;})};}
+function encodeG(g){const mt=g.mt,ej=g.ej;return[PHS.indexOf(g.ph),N(g.gid),N(g.seed),ids(g.imp),ids(g.dead),ids(g.gone),(g.bodies||[]).map(b=>[idNum(b[0]),N(b[1]),N(b[2])]),[N(g.tk[0]),N(g.tk[1])],
+  pairs(g.kc),pairs(g.em),mt?[N(mt.id),idNum(mt.by),mt.b?idNum(mt.b):-1,N(mt.t)]:[],
+  ej?[ej.p?idNum(ej.p):-1,ej.imp?1:0,ej.tie?1:0,ej.skip?1:0,N(ej.t),Object.entries(ej.cnt||{}).map(([k,v])=>[k==='s'?-2:idNum(k),N(v)])]:[],
+  g.win?[g.win[0]==='imp'?1:0,WHY.indexOf(g.win[1])]:[],(g.lk||[]).map(x=>[idNum(x[0]),idNum(x[1])]),
+  (g.bots||[]).map(b=>[idNum(b[0]),N(b[1]),N(b[2]),b[3]===-1?-1:1,b[4]?1:0,b[5]?idNum(b[5]):-1]),
+  Object.entries(g.bn||{}).map(([k,v])=>[idNum(k),BOT_NAMES.indexOf(v[0]),N(v[1]),packOutfit(v[2])]),N(g.nb),
+  Object.entries(g.pl||{}).map(([k,v])=>[idNum(k),N(v[1]),packOutfit(v[2]),isBot(k)?BOT_NAMES.indexOf(v[0]):-1]),
+  [N(g.set.ni),N(g.set.kcd),g.set.roles===0?0:1],pairs(g.ack),pairs(g.td),
+  Object.entries(g.bv||{}).map(([k,v])=>[idNum(k),v==='s'?-2:idNum(v)]),(g.bch||[]).map(m=>[N(m[0]),idNum(m[1]),N(m[2]),m[3]?idNum(m[3]):-1,N(m[4])]),
+  N(g.bs),N(g.mc),Object.entries(g.ty||{}).map(([k,v])=>[idNum(k),TYK.indexOf(v)]),pairs(g.kn)];}
+function decodeG(d,names){if(!Array.isArray(d)||d.length<27)return null;const A=i=>Array.isArray(d[i])?d[i]:[];const nm=id=>names.get(id)||'Tripulante';
+  const g={ph:PHS[d[0]]||'lobby',gid:N(d[1]),seed:N(d[2]),imp:unids(d[3]),dead:unids(d[4]),gone:unids(d[5]),bodies:A(6).map(b=>[numId(b[0]),N(b[1]),N(b[2])]).filter(b=>b[0]),
+    tk:[N(A(7)[0]),N(A(7)[1])],kc:unpairs(d[8]),em:unpairs(d[9]),mt:null,ej:null,win:null,
+    lk:A(13).map(x=>[numId(x[0]),numId(x[1])]),bots:A(14).map(b=>[numId(b[0]),N(b[1]),N(b[2]),b[3],b[4],numId(b[5])]).filter(b=>b[0]),
+    bn:{},nb:N(d[16]),pl:{},set:{ni:N(A(18)[0])||1,kcd:N(A(18)[1])||25,roles:A(18)[2]===0?0:1},ack:unpairs(d[19]),td:unpairs(d[20]),bv:{},
+    bch:A(22).map(m=>[N(m[0]),numId(m[1]),N(m[2]),numId(m[3]),N(m[4])]),bs:N(d[23]),mc:N(d[24]),ty:{},kn:unpairs(d[26])};
+  const mt=A(10);if(mt.length===4)g.mt={id:N(mt[0]),by:numId(mt[1]),b:numId(mt[2]),t:N(mt[3])};
+  const ej=A(11);if(ej.length===6){const cnt={};for(const e of Array.isArray(ej[5])?ej[5]:[]){const k=e[0]===-2?'s':numId(e[0]);if(k)cnt[k]=N(e[1]);}g.ej={p:numId(ej[0]),imp:!!ej[1],tie:!!ej[2],skip:!!ej[3],t:N(ej[4]),cnt};}
+  const w=A(12);if(w.length===2)g.win=[w[0]?'imp':'crew',WHY[w[1]]||''];
+  for(const e of A(15)){const k=numId(e[0]);if(k)g.bn[k]=[BOT_NAMES[e[1]]||'Robô',clamp(N(e[2]),0,NCOL-1),cleanOutfit(e[3])];}
+  for(const e of A(17)){const k=numId(e[0]);if(!k)continue;g.pl[k]=[isBot(k)?(BOT_NAMES[e[3]]||'Robô'):nm(e[0]),clamp(N(e[1]),0,NCOL-1),cleanOutfit(e[2])];}
+  for(const e of A(21)){const k=numId(e[0]);if(k)g.bv[k]=e[1]===-2?'s':numId(e[1]);}
+  for(const e of A(25)){const k=numId(e[0]);if(k&&TYK[e[1]])g.ty[k]=TYK[e[1]];}
+  return g;}
+// Imita a interface de "sala" usada pelo jogo, por cima do WebSocket do servidor do site.
+function makeSiteRoom(ws,welcome){
+  const names=new Map();for(const p of(welcome.nomes||[]).concat(welcome.players||[]))if(typeof p.id==='number'&&typeof p.name==='string')names.set(p.id,p.name);
+  const st=new Map();for(const p of welcome.players||[])if(p.id!==welcome.id)st.set(p.id,{p:null,g:null});
+  const subs=new Set(),errs=new Set();let myP={},snap=[];
+  const rebuild=()=>{snap=[{peer:'p'+welcome.id,sameTab:true,isMe:true,kind:'viewer',presence:myP}];
+    for(const[id,v]of st){const pr=v.p?Object.assign({},v.p):{};if(v.g)pr.g=v.g;snap.push({peer:'p'+id,sameTab:false,isMe:false,kind:'viewer',presence:pr});}
+    for(const f of subs)try{f({peers:snap});}catch(e){}};
+  rebuild();
+  ws.onmessage=ev=>{let m;try{m=JSON.parse(ev.data);}catch(e){return;}if(!m||typeof m.t!=='string')return;
+    if(m.t==='join'){names.set(m.id,m.name);if(!st.has(m.id))st.set(m.id,{p:null,g:null});rebuild();}
+    else if(m.t==='leave'){st.delete(m.id);rebuild();}
+    else if(m.t==='p'||m.t==='g'){if(m.id===welcome.id)return;const v=st.get(m.id)||{p:null,g:null};st.set(m.id,v);
+      if(m.t==='p')v.p=decodePres(m.d,names.get(m.id));else v.g=Array.isArray(m.d)&&m.d.length?decodeG(m.d,names):null;rebuild();}};
+  ws.onclose=()=>{for(const f of errs)try{f({code:'upstream_error',message:'fechou'});}catch(e){}};
+  const send=o=>{try{if(ws.readyState===1)ws.send(JSON.stringify(o));}catch(e){}};
+  return{peers:()=>snap,
+    presence(patch){for(const k in patch){if(k==='g')continue;if(patch[k]===null)delete myP[k];else myP[k]=patch[k];}
+      if('g' in patch)send({t:'g',d:patch.g?encodeG(patch.g):[]});
+      send({t:'p',d:encodePres(myP)});rebuild();return Promise.resolve();},
+    onPeers(fn,onErr){subs.add(fn);if(onErr)errs.add(onErr);setTimeout(()=>fn({peers:snap}),0);return()=>{subs.delete(fn);errs.delete(onErr);};},
+    leave(){ws.onclose=null;try{ws.close();}catch(e){}return Promise.resolve();}};
+}
+function conectarSite(url){
+  return new Promise((resolve,reject)=>{let pronto=false,ws;
+    const falhar=msg=>{if(pronto)return;pronto=true;clearTimeout(to);try{ws.close();}catch(e){}reject(new Error(msg));};
+    try{ws=new WebSocket(url);}catch(e){reject(e);return;}
+    const to=setTimeout(()=>falhar('Tempo esgotado. Confira a internet e tente de novo.'),8000);
+    ws.onopen=()=>ws.send(JSON.stringify({t:'join'}));
+    ws.onmessage=ev=>{let m;try{m=JSON.parse(ev.data);}catch(e){return;}if(pronto)return;
+      if(m.t==='welcome'){pronto=true;clearTimeout(to);resolve({ws,welcome:m});}else if(m.t==='error')falhar(m.msg||'Não deu para entrar.');};
+    ws.onerror=()=>falhar('Não consegui conectar. Confira a internet e se você está na sua conta.');
+    ws.onclose=()=>falhar('A conexão foi encerrada. Tente de novo.');});
+}
+async function joinSite(c,created){
+  audioOn();const note=$('note');
+  if(!window.QGConta){note.textContent='O modo online só funciona no site queres.games.';return;}
+  if(!created){c=cleanCode(c);if(!/^[A-HJ-NP-Z2-9]{4}$/.test(c)){note.textContent='Digite o código de 4 letras que seu amigo mandou.';return;}}
+  const eu=await siteConta(true);
+  if(!eu){note.textContent='Não consegui falar com o servidor de contas. Tente de novo.';return;}
+  if(!eu.logado){note.textContent='Entre na sua conta do site para jogar online.';return;}
+  $('bCreate').disabled=$('bJoin').disabled=true;
+  const base=onlineBase();
+  try{
+    if(created){note.textContent='Criando a sala…';const r=await fetch(base.replace(/^ws/,'http')+'/nova',{method:'POST',credentials:'include'});
+      if(r.status===401)throw new Error('Sua conta saiu. Entre de novo para jogar online.');if(!r.ok)throw new Error('Não consegui criar a sala agora. Tente de novo.');c=(await r.json()).codigo;}
+    else note.textContent='Entrando na sala '+c+'…';
+    const{ws,welcome}=await conectarSite(base+'/sala/'+c+'?modo='+(created?'criar':'entrar'));
+    note.textContent='';
+    const nr=makeSiteRoom(ws,welcome);
+    offline=false;NET={room:{presence:()=>Promise.resolve()},nr,code:welcome.room||c,joinedAt:performance.now(),unsubs:[],created:!!created,aloneWarned:false,site:true};
+    NET.unsubs.push(nr.onPeers(()=>{},()=>{if(MODE==='game'&&NET&&NET.nr===nr){toast('A conexão com a sala caiu.');leaveGame();}}));
+    myId=null;resetSession();enterGame();
+    toast(created?'Sala '+NET.code+' criada. Passe o código para os amigos!':'Você entrou na sala '+NET.code);
+  }catch(e){note.textContent=e.message||'Não deu para entrar agora.';}
+  finally{$('bCreate').disabled=$('bJoin').disabled=false;}
+}
+
 async function initLobby(){
+  if(SITE){$('roomsSec').hidden=true;$('fldName').hidden=true;$('acctBox').hidden=false;siteConta(false);
+    $('bConta').onclick=async()=>{if(!window.QGConta){$('note').textContent='A conta só funciona no site queres.games.';return;}if(SITE_NAME)await window.QGConta.perfil();else await window.QGConta.entrar();siteConta(false);};
+    if(window.QGConta&&window.QGConta.aoMudar)window.QGConta.aoMudar(()=>siteConta(false));
+    return;}
   const room=await getRoom();
   if(!room){$('roomList').innerHTML='';const p=document.createElement('p');p.className='empty';p.textContent='As salas online funcionam quando o jogo é aberto pelo link do Claude, com sua conta. O treino com robôs funciona em qualquer lugar.';$('roomList').append(p);return;}
   lobbyUnsub=room.onPeers(ch=>{lobbyPeers=ch.peers.slice();renderRoomList();},()=>{});
@@ -554,13 +675,16 @@ function renderRoomList(){
     b.append(k,s,go);b.onclick=()=>joinOnline(c);list.append(b);
   }
 }
-function readName(){let n=cleanName($('nm').value);if(!n){n='Tripulante'+((Math.random()*90+10)|0);$('nm').value=n;}lsSet('inf_name',n);return n;}
+function readName(){if(SITE)return SITE_NAME||'Você';return readNameField();}
+function readNameField(){let n=cleanName($('nm').value);if(!n){n='Tripulante'+((Math.random()*90+10)|0);$('nm').value=n;}lsSet('inf_name',n);return n;}
 async function createOnline(){
+  if(SITE)return joinSite('',true);
   audioOn();let c='';for(let k=0;k<4;k++)c+=CODE_CHARS[(Math.random()*CODE_CHARS.length)|0];
   const used=new Set(lobbyPeers.map(p=>p.presence&&p.presence.code));if(used.has(c))return createOnline();
   joinOnline(c,true);
 }
 async function joinOnline(c,created){
+  if(SITE)return joinSite(c,created);
   audioOn();c=cleanCode(c);const note=$('note');
   if(c.length!==4){note.textContent='O código tem 4 letras ou números.';return;}
   const room=await getRoom();
@@ -615,6 +739,7 @@ function sendPresence(dt){
   // lobby global: anuncia a sala para a lista de salas abertas
   NET.lobbyAcc=(NET.lobbyAcc||0)+dt;
   if(NET.lobbyAcc>1.5){NET.lobbyAcc=0;const ph=G?G.ph:'lobby',k=NET.code+ph;if(k!==NET.lastLobby){NET.lastLobby=k;NET.room.presence({code:NET.code,ph}).catch(()=>{NET.lastLobby='';});}}
+  if(NET.site){NET.keep=(NET.keep||0)+dt;if(NET.keep>3){NET.keep=0;lastPresJSON='';lastGJSON='';}}
   if(presAcc<.066)return;presAcc=0;
   const p=mePres();
   if(isHost&&G&&broadcastAcc>=.1){broadcastAcc=0;const gj=JSON.stringify(G);if(gj!==lastGJSON){lastGJSON=gj;p.g=G;}}
@@ -721,9 +846,13 @@ function startMeeting(by,body){
   for(const[,b]of BOTS){b.skT=0;b.toBtn=false;}
   G.mc++;G.mt={id:G.gid%100000*100+G.mc,by,b:body,t:MEET_T};hostMT=MEET_T;G.bodies=[];G.ph='meet';G.bv={};
   for(const[id,b]of BOTS){b.voteAt=rnd(14,VOTE_AT-3);b.path=[];b.repT=0;b.chatAt=rnd(VOTE_AT+2,MEET_T-3);b.chatted=false;}
-  if(isBot(by)){botSay(by,body?'Achei o corpo de '+nameOf(body)+' em '+(roomName(BOTS.get(by).x,BOTS.get(by).y)||'algum lugar')+'!':'Apertei o alarme. Alguém viu algo estranho?');}
+  if(isBot(by)){const bb=BOTS.get(by);botSay(by,body?0:1,body,bb?roomIndexAt(bb.x,bb.y):-1);}
 }
-function botSay(id,text){G.bs=(G.bs||0)+1;G.bch.push([G.bs,id,text.slice(0,80)]);if(G.bch.length>4)G.bch.shift();}
+function botSay(id,tpl,arg=null,room=-1){G.bs=(G.bs||0)+1;G.bch.push([G.bs,id,tpl,arg,room]);if(G.bch.length>4)G.bch.shift();}
+const BOT_LINES=['Achei o corpo de {a} em {r}!','Apertei o alarme. Alguém viu algo estranho?','Eu vi {a} eliminando alguém!','Eu estava fazendo tarefas.','Não vi nada.',
+  'Quem estava perto do corpo?','Eu estava em {r}.','Suspeito de alguém, mas sem provas.','Vou pular, não tenho certeza.','Toquei o alarme: eu vi {a} eliminando alguém!'];
+function botLine(m){const t=BOT_LINES[m[2]];if(!t)return'';return t.replace('{a}',m[3]?nameOf(m[3]):'alguém').replace('{r}',ROOMS[m[4]]?ROOMS[m[4]][0]:'algum lugar');}
+function roomIndexAt(x,y){const tx=Math.floor(x/T),ty=Math.floor(y/T);if(!walk(tx,ty))return-1;const g=grid[ty*W+tx];return g===HALL?-1:g-1;}
 function resolveMeeting(P){
   const cnt={};for(const id of aliveIds()){const v=voteOf(id,P);if(v!=null)cnt[v]=(cnt[v]||0)+1;}
   let top=null,max=0,tie=false;for(const k in cnt){if(cnt[k]>max){max=cnt[k];top=k;tie=false;}else if(cnt[k]===max)tie=true;}
@@ -757,7 +886,7 @@ function botsTick(dt,P){
     }else if(G.ph==='play'){
       const alarm=!imp&&!dead&&b.sus&&!G.dead.includes(b.sus)&&!((G.em[id]||0)>=1);
       if(alarm){
-        if(dist(b.x,b.y,BTN.x,BTN.y)<BTN_R){G.em[id]=1;b.toBtn=false;startMeeting(id,null);botSay(id,'Toquei o alarme: eu vi '+nameOf(b.sus)+' eliminando alguém!');b.chatted=true;continue;}
+        if(dist(b.x,b.y,BTN.x,BTN.y)<BTN_R){G.em[id]=1;b.toBtn=false;startMeeting(id,null);botSay(id,9,b.sus);b.chatted=true;continue;}
         if(!b.toBtn||!b.path.length){b.toBtn=true;b.atTask=-1;b.goalTask=null;b.path=bfs(...tileOf(b),28,7)||[];}
         moveBot(b,dt);
       }
@@ -770,8 +899,8 @@ function botsTick(dt,P){
     }else if(G.ph==='meet'){b.m=0;b.path=[];
       if(dead)continue;
       if(!b.chatted&&hostMT<b.chatAt){b.chatted=true;
-        if(!imp&&b.sus&&!G.dead.includes(b.sus))botSay(id,'Eu vi '+nameOf(b.sus)+' eliminando alguém!');
-        else if(Math.random()<.55)botSay(id,pick(['Eu estava fazendo tarefas.','Não vi nada.','Quem estava perto do corpo?','Eu estava em '+pick(ROOMS)[0]+'.','Suspeito de alguém, mas sem provas.','Vou pular, não tenho certeza.']));}
+        if(!imp&&b.sus&&!G.dead.includes(b.sus))botSay(id,2,b.sus);
+        else if(Math.random()<.55)botSay(id,pick([3,4,5,6,7,8]),null,(Math.random()*ROOMS.length)|0);}
       if(G.bv[id]==null&&hostMT<b.voteAt){
         const others=aliveIds().filter(o=>o!==id);let v='s';
         if(!imp&&b.sus&&!G.dead.includes(b.sus))v=b.sus;
@@ -1401,10 +1530,10 @@ function openMeeting(){
   const mt=G.mt;const by=nameOf(mt.by);
   $('mtKind').textContent=mt.b?'Corpo encontrado':'Reunião de emergência';
   $('mtTitle').textContent=mt.b?by+' achou '+nameOf(mt.b)+' eliminado':by+' tocou o alarme';
-  $('chatLog').innerHTML='';
+  $('meetLog').innerHTML='';
   // marca mensagens antigas como vistas
   for(const m of allMessages())chatSeen.add(m.key);
-  sysMsg('Discutam quem é o infiltrado. A votação abre em instantes.');
+  sysMsg(SITE?'Conversem (por voz ou pessoalmente) sobre quem é o infiltrado. A votação abre em instantes.':'Discutam quem é o infiltrado. A votação abre em instantes.');
   if(mt.b&&inGame(myId)&&!isDead(myId)&&typeOf(myId)==='det'){const lk=G.lk.find(x=>x[0]===mt.b);if(lk){const kt=typeOf(lk[1]);sysMsg('Pista do detetive (só você vê): quem eliminou '+nameOf(mt.b)+' é '+(kt==='imp'?'um infiltrado comum':'um '+TYPES[kt].n)+'.');}}
   else if(!mt.b&&G.dead.length&&inGame(myId)&&typeOf(myId)==='det'){}
 }
@@ -1412,10 +1541,10 @@ function closeMeeting(){if($('meet').hidden)return;$('meet').hidden=true;}
 function allMessages(){
   const out=[];if(!G)return out;
   for(const[id,p]of presentPlayers()){if(!Array.isArray(p.ch))continue;for(const m of p.ch){if(!Array.isArray(m))continue;out.push({key:id+':'+m[0],id,text:String(m[1]||'').slice(0,90)});}}
-  for(const m of G.bch||[])if(Array.isArray(m))out.push({key:'b:'+m[0],id:m[1],text:String(m[2]||'').slice(0,90)});
+  for(const m of G.bch||[])if(Array.isArray(m)&&typeof m[2]==='number')out.push({key:'b:'+m[0],id:m[1],text:botLine(m)});
   return out;
 }
-function sysMsg(t){const d=document.createElement('div');d.className='sys';d.textContent=t;$('chatLog').append(d);}
+function sysMsg(t){const d=document.createElement('div');d.className='sys';d.textContent=t;$('meetLog').append(d);}
 function updateMeeting(){
   if($('meet').hidden||!G||!G.mt)return;
   const mt=G.mt,P=presentPlayers(),meAlive=inGame(myId)&&!isDead(myId);
@@ -1443,16 +1572,16 @@ function updateMeeting(){
       g.append(b);}
   }
   $('bVote').disabled=!meAlive||!open||!!myVote||!mtSel;$('bSkip').disabled=!meAlive||!open||!!myVote;
-  $('chatIn').disabled=!inGame(myId);
+  const ci=$('chatIn');if(ci)ci.disabled=!inGame(myId);
   // mensagens novas
   for(const m of allMessages()){if(chatSeen.has(m.key))continue;chatSeen.add(m.key);
     const senderDead=isDead(m.id);if(senderDead&&meAlive)continue;
     const d=document.createElement('div');d.className='msg'+(senderDead?' ghost':'');const b=document.createElement('b');b.textContent=nameOf(m.id)+':';b.style.color=colHex(colorOf(m.id));
-    d.append(b,document.createTextNode(m.text));const log=$('chatLog');log.append(d);log.scrollTop=log.scrollHeight;}
+    d.append(b,document.createTextNode(m.text));const log=$('meetLog');log.append(d);log.scrollTop=log.scrollHeight;}
 }
 $('bVote').onclick=()=>{if(!mtSel||!G||!G.mt)return;myVote=[G.mt.id,mtSel];lastPresJSON='';gridKey='';snd('click');sysMsg('Você votou em '+nameOf(mtSel)+'.');};
 $('bSkip').onclick=()=>{if(!G||!G.mt)return;myVote=[G.mt.id,'s'];lastPresJSON='';gridKey='';snd('click');sysMsg('Você pulou o voto.');};
-$('chatForm').addEventListener('submit',e=>{e.preventDefault();const v=$('chatIn').value.replace(/[\u0000-\u001f\u200b-\u200f\u202a-\u202e\u2066-\u2069]/g,'').trim().slice(0,90);if(!v)return;
+if($('chatForm'))$('chatForm').addEventListener('submit',e=>{e.preventDefault();const v=$('chatIn').value.replace(/[\u0000-\u001f\u200b-\u200f\u202a-\u202e\u2066-\u2069]/g,'').trim().slice(0,90);if(!v)return;
   myChat.push([++chatSeq,v]);if(myChat.length>3)myChat.shift();lastPresJSON='';$('chatIn').value='';});
 
 // ======================= TELAS =======================
