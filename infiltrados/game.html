@@ -651,6 +651,11 @@ async function joinSite(c,created){
 
 async function initLobby(){
   if(SITE){$('roomsSec').hidden=true;$('fldName').hidden=true;$('acctBox').hidden=false;siteConta(false);
+    // O online só aparece quando o servidor do site responde; antes disso fica só o treino com robôs.
+    $('bCreate').disabled=$('bJoin').disabled=true;
+    fetch(onlineBase().replace(/^ws/,'http')+'/saude',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null).then(j=>{
+      const ok=!!(j&&j.ok&&j.banco);$('bCreate').disabled=$('bJoin').disabled=!ok;$('code').disabled=!ok;
+      if(!ok)$('note').textContent='O jogo online chega em breve. Por enquanto, treine com os robôs!';});
     $('bConta').onclick=async()=>{if(!window.QGConta){$('note').textContent='A conta só funciona no site queres.games.';return;}if(SITE_NAME)await window.QGConta.perfil();else await window.QGConta.entrar();siteConta(false);};
     if(window.QGConta&&window.QGConta.aoMudar)window.QGConta.aoMudar(()=>siteConta(false));
     return;}
