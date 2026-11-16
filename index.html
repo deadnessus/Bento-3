@@ -82,6 +82,22 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .help{background:var(--glass2);border:1px solid var(--line);border-radius:16px;padding:12px 16px;text-align:left;font-size:13px;line-height:1.5;color:var(--mute)}
 .help b{color:var(--ink)} .help ul{margin:6px 0;padding-left:18px}
 body.at-home .hud, body.at-home .tray, body.at-home .card, body.at-home .menu{display:none!important}
+.home-card.online-mode .main-only{display:none!important}
+.home-card:not(.online-mode) .onpanel{display:none}
+.onpanel{display:flex;flex-direction:column;gap:10px}
+.joinrow{display:flex;gap:8px;margin:0}
+.joinrow input{flex:1;min-width:0;background:var(--glass2);border:1px solid var(--line);border-radius:16px;color:var(--ink);font:800 24px var(--font);
+  text-align:center;letter-spacing:.35em;text-transform:uppercase;padding:10px 12px}
+.joinrow input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.joinrow input::placeholder{letter-spacing:.05em;font-size:16px;font-weight:600;color:var(--mute)}
+.lobh{margin:8px 0 0;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);text-shadow:0 1px 6px #000}
+.olist{display:flex;flex-direction:column;gap:6px}
+.olist .empty{margin:0;color:var(--mute);font-size:13px;background:var(--glass);border-radius:12px;padding:10px}
+.oitem{appearance:none;display:flex;align-items:center;gap:12px;background:var(--glass2);border:1px solid var(--line);border-radius:14px;padding:10px 14px;
+  color:var(--ink);font:600 13px var(--font);cursor:pointer;text-align:left}
+.oitem b{font-size:20px;letter-spacing:.2em;font-weight:800;color:var(--gold)} .oitem span{color:var(--mute);flex:1}
+.oitem:hover{border-color:var(--accent)}
+.wifi{margin:0;font-size:11.5px;line-height:1.45;color:var(--mute);text-shadow:0 1px 6px #000}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
 @media (max-width:620px){.stat.hide-s{display:none}.tool{width:58px}.tool canvas{width:40px;height:35px}.card{bottom:calc(100px + env(safe-area-inset-bottom,0px))}}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
@@ -100,7 +116,7 @@ body.at-home .hud, body.at-home .tray, body.at-home .card, body.at-home .menu{di
       <div><i id="dI" style="background:var(--ind)"></i></div>
     </div>
   </div>
-  <div class="pill" id="onlinePill" hidden><span class="dot"></span><div class="stat"><small id="onRole">Online</small><b id="onCount">1</b></div></div>
+  <div class="pill" id="onlinePill" hidden role="button" tabindex="0" title="Toque para copiar o código da sala" style="cursor:pointer"><span class="dot"></span><div class="stat"><small id="onRole">Online</small><b id="onCount">1</b></div></div>
   <div class="spacer"></div>
   <div class="speeds" id="speeds">
     <button class="btn" data-speed="0" id="sp0" aria-label="Pausar">❚❚</button>
@@ -146,19 +162,30 @@ body.at-home .hud, body.at-home .tray, body.at-home .card, body.at-home .menu{di
   <div class="home-card">
     <h1>Horizonte</h1>
     <p class="tag">Construa a sua cidade, quadra por quadra.</p>
-    <button class="big primary" id="hContinue" hidden>Continuar <small id="hContInfo"></small></button>
-    <button class="big" id="hNew">Novo jogo</button>
-    <button class="big" id="hOnline">Online <small>cidade compartilhada</small></button>
+    <button class="big primary main-only" id="hContinue" hidden>Continuar <small id="hContInfo"></small></button>
+    <button class="big main-only" id="hNew">Novo jogo</button>
+    <button class="big main-only" id="hOnline">Online <small>jogar com amigos</small></button>
+    <div class="onpanel" id="onPanel">
+      <button class="big primary" id="oCreate">Criar sala <small>gera um código</small></button>
+      <form class="joinrow" id="oJoinForm">
+        <input id="oCode" maxlength="3" placeholder="Código" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Código da sala com 3 caracteres">
+        <button class="big" id="oJoin" type="submit">Entrar</button>
+      </form>
+      <h4 class="lobh">Jogos abertos agora</h4>
+      <div class="olist" id="oList"><p class="empty">Procurando jogos…</p></div>
+      <p class="wifi">O navegador não consegue ver quem está no seu Wi-Fi. Por isso aparecem aqui as salas que estão jogando agora neste link: é só tocar para entrar.</p>
+      <button class="linkbtn" id="oBack" type="button">Voltar</button>
+    </div>
     <p class="note" id="hNote"></p>
-    <button class="linkbtn" id="hHelp">Como jogar</button>
-    <div class="help" id="helpBox" hidden>
+    <button class="linkbtn main-only" id="hHelp">Como jogar</button>
+    <div class="help main-only" id="helpBox" hidden>
       <ul>
         <li>Faça <b>estradas</b> e pinte <b>zonas</b> ao lado delas: verde mora gente, azul é comércio, amarelo é indústria.</li>
         <li>Nada cresce sem <b>energia</b>: construa uma usina perto. Prédios maiores pedem <b>água</b> e valor do solo alto.</li>
         <li><b>Praças, escolas, hospitais, polícia e bombeiros</b> valorizam o bairro. Indústria polui, então deixe longe das casas.</li>
         <li>Fique de olho nas barras de demanda (R, C, I) e no caixa. Um dia dura 10 minutos.</li>
         <li>Celular: um dedo usa a ferramenta, dois dedos movem e dão zoom. Computador: botão direito arrasta, roda dá zoom.</li>
-        <li><b>Online</b>: todo mundo que abrir este link constrói a mesma cidade, ao vivo, com o mesmo caixa.</li>
+        <li><b>Online</b>: crie uma sala e passe o código de 3 letras para os amigos. Quem entrar constrói a mesma cidade, ao vivo, com o mesmo caixa.</li>
       </ul>
     </div>
   </div>
@@ -706,7 +733,7 @@ function render(){
     for(let k=0;k<lights.length;k+=3){const r=lights[k+2];g.drawImage(glowSpr,lights[k]-r,lights[k+1]-r*0.6,r*2,r*1.2);}
     g.globalCompositeOperation='source-over';}
   // no-power icons
-  if(Math.floor(nowT*2)%2){for(let k=0;k<warnIcons.length;k+=3){const p=S3(warnIcons[k]+0.5,warnIcons[k+1]+0.5,warnIcons[k+2]*0.6+14);
+  if(MODE!=='demo'&&Math.floor(nowT*2)%2){for(let k=0;k<warnIcons.length;k+=3){const p=S3(warnIcons[k]+0.5,warnIcons[k+1]+0.5,warnIcons[k+2]*0.6+14);
     g.fillStyle='rgba(20,20,30,.8)';g.beginPath();g.arc(p[0],p[1],7,0,7);g.fill();g.fillStyle='#ffd23f';g.beginPath();
     g.moveTo(p[0]+1,p[1]-5);g.lineTo(p[0]-3,p[1]+1);g.lineTo(p[0],p[1]+1);g.lineTo(p[0]-1,p[1]+5);g.lineTo(p[0]+3,p[1]-1);g.lineTo(p[0],p[1]-1);g.closePath();g.fill();}}
   // vignette
@@ -846,7 +873,7 @@ cv.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')hover=null;});
 function zoomAt(sx,sy,f){const before=screenToWorldPx(sx,sy);cam.zoom=clamp(cam.zoom*f,0.3,3.2);const after=screenToWorldPx(sx,sy);cam.x+=before[0]-after[0];cam.y+=before[1]-after[1];}
 function screenToWorldPx(sx,sy){return[(sx-W/2)/cam.zoom+cam.x,(sy-H/2)/cam.zoom+cam.y];}
 cv.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.clientX,e.clientY,Math.exp(-e.deltaY*0.0015));clampCam();},{passive:false});
-const keys={};addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;
+const keys={};addEventListener('keydown',e=>{if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;keys[e.key.toLowerCase()]=true;
   if(e.key===' '){setSpeed(S.speed?0:1);e.preventDefault();}
   const n=parseInt(e.key);if(n>=1&&n<=9)selectTool(TOOLS[n-1]);if(e.key==='0')selectTool(TOOLS[TOOLS.length-1]);if(e.key==='Escape')selectTool(TOOLS[0]);});
 addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
@@ -931,58 +958,114 @@ function load(){try{const s=localStorage.getItem(SAVE_KEY);if(s)return deseriali
 
 // ======================= ONLINE =======================
 let MODE='demo';
-const ON={active:false,db:null,room:null,host:false,tab:'t'+Math.random().toString(36).slice(2,10),earned:0,spends:{},mySpend:0,spendWritten:0,
-  queue:new Map(),flushing:false,metaBusy:false,spendBusy:false,metaAcc:0,spendAcc:0,flushAcc:0,presAcc:0,lastPres:'',unsubs:[],peers:[],ready:false,
-  canWrite:true,baseTree:null,lastLv:'',tiles:new Map(),metaMissing:false,creating:false,hostTimer:0,taxDirty:false};
+const CODE_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const ON={active:false,db:null,lobby:null,cityRoom:null,code:'',base:'',host:false,tab:'t'+Math.random().toString(36).slice(2,10),earned:0,spends:{},mySpend:0,spendWritten:0,
+  queue:new Map(),flushing:false,metaBusy:false,spendBusy:false,metaAcc:0,spendAcc:0,flushAcc:0,presAcc:0,lobbyAcc:0,lastPres:'',lastLobby:'',unsubs:[],peers:[],lobbyPeers:[],ready:false,
+  canWrite:true,baseTree:null,lastLv:'',tiles:new Map(),hostTimer:0,taxDirty:false,lobbyUnsub:null};
 let dbP=null,roomP=null,userP=null;
 const useCap=n=>(window.claude&&typeof window.claude.use==='function')?window.claude.use(n).catch(()=>null):Promise.resolve(null);
 function getDb(){return dbP||(dbP=useCap('db'));}
-async function startOnline(){
-  const note=$('hNote');note.textContent='Conectando à cidade online…';$('hOnline').disabled=true;
+function getRoom(){return roomP||(roomP=useCap('room'));}
+const cleanCode=v=>(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/[IO]/g,m=>m==='I'?'1':'0').slice(0,3);
+
+// ---- lobby: list of open cities ----
+async function openOnlinePanel(){
+  const note=$('hNote');note.textContent='';
   const db=await getDb();
-  if(!db){note.textContent='O modo online só funciona abrindo o jogo pelo link do Claude, com sua conta.';$('hOnline').disabled=false;return;}
-  Object.assign(ON,{active:true,db,host:false,ready:false,earned:0,spends:{},mySpend:0,spendWritten:0,peers:[],unsubs:[],tiles:new Map(),queue:new Map(),
-    metaMissing:false,creating:false,canWrite:true,lastLv:'',taxDirty:false});
-  MODE='online';
+  if(!db){note.textContent='O modo online só funciona abrindo o jogo pelo link do Claude, com sua conta.';return;}
   userP=userP||useCap('user');const user=await userP;
-  if(user){const w=await user.can('data.write');if(w===false)ON.canWrite=false;}
+  ON.canWrite=true;if(user){const w=await user.can('data.write');if(w===false)ON.canWrite=false;}
+  $('oCreate').disabled=!ON.canWrite;
+  if(!ON.canWrite)note.textContent='Seu acesso a este link é só de visualização: dá para entrar em salas e olhar, mas não criar nem construir.';
+  document.querySelector('.home-card').classList.add('online-mode');
+  setTimeout(()=>$('oCode').focus({preventScroll:true}),50);
+  renderLobby();
+  const room=await getRoom();
+  if(room&&!ON.lobbyUnsub){ON.lobby=room;ON.lobbyUnsub=room.onPeers(ch=>{ON.lobbyPeers=ch.peers.slice();renderLobby();},()=>{});}
+  if(!room)$('oList').innerHTML='<p class="empty">Não deu para ver os jogos abertos agora. Você ainda pode entrar com um código.</p>';
+}
+function renderLobby(){
+  const list=$('oList');if(!list)return;
+  const games=new Map();
+  for(const p of ON.lobbyPeers){const pr=p.presence||{};const c=cleanCode(pr.code);if(c.length!==3)continue;
+    const g0=games.get(c)||{n:0,pop:0};g0.n++;g0.pop=Math.max(g0.pop,+pr.pop||0);games.set(c,g0);}
+  if(!games.size){list.innerHTML='<p class="empty">Nenhuma sala aberta agora. Crie uma e passe o código para os amigos.</p>';return;}
+  list.innerHTML='';
+  for(const[c,g0]of[...games].sort((a,b)=>b[1].n-a[1].n).slice(0,8)){
+    const b=document.createElement('button');b.className='oitem';b.type='button';
+    const k=document.createElement('b');k.textContent=c;
+    const sp=document.createElement('span');sp.textContent=g0.n+(g0.n>1?' jogadores':' jogador')+' · '+g0.pop.toLocaleString('pt-BR')+' habitantes';
+    const go=document.createElement('small');go.textContent='Entrar →';
+    b.append(k,sp,go);b.onclick=()=>joinByCode(c);list.append(b);
+  }
+}
+async function createRoom(){
+  const note=$('hNote');const db=await getDb();if(!db)return;
+  $('oCreate').disabled=true;note.textContent='Criando sala…';
+  try{
+    for(let tries=0;tries<8;tries++){
+      let c='';for(let k=0;k<3;k++)c+=CODE_CHARS[(Math.random()*CODE_CHARS.length)|0];
+      const snap=await db.doc('cities/'+c).get();
+      if(snap.exists)continue;
+      await db.doc('cities/'+c).set({seed:(Math.random()*1e9)|0,time:8,earned:30000,tax:9,lv:'',pop:0});
+      note.textContent='';joinCity(c,true);return;
+    }
+    note.textContent='Não achei um código livre. Tente de novo.';
+  }catch(e){note.textContent=e&&e.code==='quota_exceeded'?'O espaço do jogo online está cheio.':'Não deu para criar a sala agora. Tente de novo.';}
+  $('oCreate').disabled=!ON.canWrite;
+}
+async function joinByCode(c){
+  c=cleanCode(c);const note=$('hNote');
+  if(c.length!==3){note.textContent='O código tem 3 letras ou números.';return;}
+  const db=await getDb();if(!db)return;
+  note.textContent='Procurando a sala '+c+'…';
+  try{const snap=await db.doc('cities/'+c).get();
+    if(!snap.exists){note.textContent='Não existe sala com o código '+c+'. Confira e tente de novo.';return;}
+    note.textContent='';joinCity(c,false);
+  }catch(e){note.textContent='Não deu para entrar agora. Tente de novo.';}
+}
+
+// ---- inside a city ----
+async function joinCity(code,created){
+  const db=await getDb();
+  Object.assign(ON,{active:true,db,code,base:'cities/'+code,host:false,ready:false,earned:0,spends:{},mySpend:0,spendWritten:0,peers:[],unsubs:[],
+    tiles:new Map(),queue:new Map(),lastLv:'',taxDirty:false,lastLobby:'',lastPres:'',created});
+  MODE='online';
+  const note=$('hNote');
   const timeout=setTimeout(()=>{if(!ON.ready&&ON.active)note.textContent='Ainda conectando… a conexão está lenta.';},10000);
-  ON.unsubs.push(db.doc('online/meta').onSnapshot(snap=>{
-    if(!snap.exists){if(!snap.metadata.fromCache){ON.metaMissing=true;if(ON.host)createMeta();else tryHost();}
-      if(!ON.canWrite&&!snap.metadata.fromCache)note.textContent='A cidade online ainda não foi criada pelo dono do jogo.';return;}
-    ON.metaMissing=false;const d=snap.data();
+  ON.unsubs.push(db.doc(ON.base).onSnapshot(snap=>{
+    if(!snap.exists){if(!snap.metadata.fromCache&&ON.ready){toast('Esta sala foi apagada');showHome();}return;}
+    const d=snap.data();
     if(!ON.ready){clearTimeout(timeout);initOnlineMap(d);}
     applyMeta(d);
-  },e=>{note.textContent='Não deu para abrir a cidade online agora.';$('hOnline').disabled=false;leaveOnline();MODE='demo';}));
-  ON.unsubs.push(db.collection('tiles').onSnapshot(snap=>{
+  },()=>{note.textContent='Não deu para abrir a sala agora.';leaveOnline();MODE='demo';}));
+  ON.unsubs.push(db.collection(ON.base+'/tiles').onSnapshot(snap=>{
     for(const ch of snap.docChanges()){const i=+ch.doc.id;if(!(i>=0&&i<N*N))continue;
       if(ch.type==='removed')ON.tiles.delete(i);else ON.tiles.set(i,ch.doc.data());if(ON.ready)applyTile(i);}
   },()=>{}));
-  ON.unsubs.push(db.collection('spend').onSnapshot(snap=>{for(const d of snap.docs){if(d.id!==ON.tab)ON.spends[d.id]=+(d.data().s)||0;}},()=>{}));
+  ON.unsubs.push(db.collection(ON.base+'/spend').onSnapshot(snap=>{for(const d of snap.docs){if(d.id!==ON.tab)ON.spends[d.id]=+(d.data().s)||0;}},()=>{}));
   tryHost();ON.hostTimer=setInterval(tryHost,5000);
-  roomP=roomP||useCap('room');roomP.then(room=>{if(!room||!ON.active)return;ON.room=room;
-    ON.unsubs.push(room.onPeers(ch=>{ON.peers=ch.peers.slice();},()=>{}));});
-}
-async function createMeta(){
-  if(ON.creating)return;ON.creating=true;
-  try{await ON.db.doc('online/meta').set({seed:(Math.random()*1e9)|0,time:8,earned:30000,tax:9,lv:'',pop:0});}catch(e){ON.creating=false;}
+  const room=await getRoom();
+  if(room&&ON.active&&ON.code===code){
+    try{const cr=await room.join('city-'+code);if(!ON.active||ON.code!==code){cr.leave().catch(()=>{});return;}
+      ON.cityRoom=cr;ON.unsubs.push(cr.onPeers(ch=>{ON.peers=ch.peers.slice();},()=>{}));}catch(e){}
+  }
 }
 async function tryHost(){
   if(!ON.active||!ON.canWrite)return;
-  try{const r=await ON.db.doc('online/host').acquire({holder:ON.tab,ttlMs:15000});
+  try{const r=await ON.db.doc(ON.base+'/lock/host').acquire({holder:ON.tab,ttlMs:15000});
     if(!ON.active)return;
     const was=ON.host;ON.host=!!r.acquired;
-    if(ON.host&&ON.metaMissing)createMeta();
-    if(ON.host&&!was&&ON.ready)toast('Você virou o prefeito: a cidade cresce pelo seu aparelho');
+    if(ON.host&&!was&&ON.ready&&ON.peers.length>1)toast('Você virou o prefeito: a cidade cresce pelo seu aparelho');
   }catch(e){if(e&&e.code==='invalid_argument')ON.canWrite=false;}
 }
 function initOnlineMap(d){
   newCity(d.seed);ON.baseTree=M.tree.slice();S.speed=1;S.time=d.time||8;S.tax=d.tax??9;ON.earned=d.earned??30000;
   for(const i of ON.tiles.keys())applyTile(i);
   ON.ready=true;
-  if(d.lv){ON.lastLv='';applyMeta(d);}
+  if(d.lv){ON.lastLv='';const h=ON.host;ON.host=false;applyMeta(d);ON.host=h;}
   recompute();stats();enterGame();
-  toast(ON.canWrite?'Cidade online: tudo que você construir aparece para todos':'Você está só olhando esta cidade');
+  toast(!ON.canWrite?'Você está só olhando a sala '+ON.code:ON.created?'Sala '+ON.code+' criada! Passe o código para os amigos':'Você entrou na sala '+ON.code);
 }
 function applyMeta(d){
   if(!ON.host){ON.earned=+d.earned||0;if(Math.abs((d.time||0)-S.time)>0.05)S.time=d.time||S.time;}
@@ -998,38 +1081,46 @@ function applyTile(i){
 }
 async function flushTiles(){
   if(ON.flushing||!ON.queue.size)return;ON.flushing=true;
-  const batch=[...ON.queue.entries()].slice(0,25);
-  try{await Promise.all(batch.map(([i,v])=>ON.db.doc('tiles/'+i).set(v)));
+  const base=ON.base,batch=[...ON.queue.entries()].slice(0,25);
+  try{await Promise.all(batch.map(([i,v])=>ON.db.doc(base+'/tiles/'+i).set(v)));
     for(const[i,v]of batch){const q=ON.queue.get(i);if(q&&q.t===v.t&&q.tr===v.tr)ON.queue.delete(i);}
   }catch(e){if(e&&e.code==='invalid_argument'){ON.canWrite=false;ON.queue.clear();toast('Você só pode ver esta cidade');}
     else if(e&&e.code==='quota_exceeded'){toast('A cidade online atingiu o limite de espaço');ON.queue.clear();}}
   ON.flushing=false;
 }
 async function writeSpend(){if(ON.spendBusy||ON.mySpend===ON.spendWritten)return;ON.spendBusy=true;const v=ON.mySpend;
-  try{await ON.db.doc('spend/'+ON.tab).set({s:v});ON.spendWritten=v;}catch(e){}ON.spendBusy=false;}
+  try{await ON.db.doc(ON.base+'/spend/'+ON.tab).set({s:v});ON.spendWritten=v;}catch(e){}ON.spendBusy=false;}
 async function writeMeta(){if(ON.metaBusy)return;ON.metaBusy=true;
   try{const lv=b64(M.lvl);const body={time:S.time,earned:ON.earned,pop:S.pop};if(lv!==ON.lastLv)body.lv=lv;
-    await ON.db.doc('online/meta').update(body);ON.lastLv=lv;}catch(e){}ON.metaBusy=false;}
-async function writeTax(){ON.taxDirty=false;const v=S.tax;try{await ON.db.doc('online/meta').update({tax:v});}catch(e){}}
+    await ON.db.doc(ON.base).update(body);ON.lastLv=lv;}catch(e){}ON.metaBusy=false;}
+async function writeTax(){ON.taxDirty=false;const v=S.tax;try{await ON.db.doc(ON.base).update({tax:v});}catch(e){}}
 function onlineTick(dt){
   if(!ON.active||!ON.ready)return;
   ON.flushAcc+=dt;if(ON.flushAcc>0.3){ON.flushAcc=0;flushTiles();}
   ON.spendAcc+=dt;if(ON.spendAcc>1.5){ON.spendAcc=0;writeSpend();if(ON.taxDirty)writeTax();}
   if(ON.host){ON.metaAcc+=dt;if(ON.metaAcc>4){ON.metaAcc=0;writeMeta();}}
-  if(ON.room){ON.presAcc+=dt;if(ON.presAcc>0.35){ON.presAcc=0;const k=hover?hover.join(','):'';if(k!==ON.lastPres){ON.lastPres=k;
-    ON.room.presence(hover&&inb(hover[0],hover[1])?{x:hover[0],y:hover[1]}:{x:null,y:null}).catch(()=>{});}}}
+  if(ON.cityRoom){ON.presAcc+=dt;if(ON.presAcc>0.35){ON.presAcc=0;const k=hover?hover.join(','):'';if(k!==ON.lastPres){ON.lastPres=k;
+    ON.cityRoom.presence(hover&&inb(hover[0],hover[1])?{x:hover[0],y:hover[1]}:{x:null,y:null}).catch(()=>{});}}}
+  if(ON.lobby){ON.lobbyAcc+=dt;if(ON.lobbyAcc>3){ON.lobbyAcc=0;const pop=Math.round(S.pop/10)*10,k=ON.code+'|'+pop;if(k!==ON.lastLobby){ON.lastLobby=k;
+    ON.lobby.presence({code:ON.code,pop}).catch(()=>{});}}}
   let others=0;for(const k in ON.spends)others+=ON.spends[k];
   S.money=ON.earned-others-ON.mySpend;
-  $('onCount').textContent=(Math.max(1,ON.peers.length))+(ON.peers.length>1?' jogadores':' jogador');
-  $('onRole').textContent=ON.canWrite?(ON.host?'Online · prefeito':'Online'):'Online · só olhando';
+  const n=Math.max(1,ON.peers.length);
+  $('onCount').textContent='Sala '+ON.code;
+  $('onRole').textContent=n+(n>1?' jogadores':' jogador')+(ON.canWrite?(ON.host?' · prefeito':''):' · só olhando');
 }
 function leaveOnline(){
   if(!ON.active)return;
   for(const u of ON.unsubs)try{u();}catch(e){}
   ON.unsubs=[];clearInterval(ON.hostTimer);
-  if(ON.room)ON.room.presence({x:null,y:null}).catch(()=>{});
+  if(ON.cityRoom)ON.cityRoom.leave().catch(()=>{});
+  if(ON.lobby)ON.lobby.presence({code:null,pop:null}).catch(()=>{});
   if(ON.ready){ON.queue.size&&flushTiles();writeSpend();if(ON.host)writeMeta();}
-  ON.active=false;ON.host=false;ON.ready=false;ON.room=null;ON.peers=[];
+  ON.active=false;ON.host=false;ON.ready=false;ON.cityRoom=null;ON.peers=[];ON.code='';
+}
+async function copyCode(){
+  if(!ON.code)return;
+  try{await navigator.clipboard.writeText(ON.code);toast('Código '+ON.code+' copiado');}catch(e){toast('Código da sala: '+ON.code);}
 }
 
 // ======================= HOME / MODES =======================
@@ -1050,19 +1141,25 @@ function buildDemo(){
 function showHome(){
   if(MODE==='solo')save();
   if(MODE==='online')leaveOnline();
-  document.body.classList.add('at-home');$('home').hidden=false;$('hNote').textContent='';$('hOnline').disabled=false;
+  document.body.classList.add('at-home');$('home').hidden=false;$('hNote').textContent='';document.querySelector('.home-card').classList.remove('online-mode');
   let info=null;try{const sv=localStorage.getItem(SAVE_KEY);if(sv){const d=JSON.parse(sv);info=d.S;}}catch(e){}
   $('hContinue').hidden=!info;if(info){$('hContInfo').textContent=(info.pop||0).toLocaleString('pt-BR')+' habitantes';}
   $('hNew').classList.toggle('primary',!info);
   buildDemo();
-  getDb().then(db=>{if(!db&&MODE==='demo')$('hNote').textContent='O modo online funciona quando o jogo é aberto pelo link do Claude.';});
+  
 }
 function enterGame(){document.body.classList.remove('at-home');$('home').hidden=true;$('card').hidden=true;
   $('onlinePill').hidden=MODE!=='online';$('speeds').style.visibility=MODE==='online'?'hidden':'visible';
   $('tax').value=S.tax;setSpeed(MODE==='online'?1:(S.speed||1));selectTool(TOOLS[0]);}
 $('hContinue').onclick=()=>{if(load()){MODE='solo';enterGame();toast('Bem-vindo de volta!');}};
 $('hNew').onclick=()=>{newCity();MODE='solo';recompute();stats();save();enterGame();toast('Comece com estradas, zonas e uma usina.');};
-$('hOnline').onclick=()=>startOnline();
+$('hOnline').onclick=()=>openOnlinePanel();
+$('oCreate').onclick=()=>createRoom();
+$('oJoinForm').onsubmit=e=>{e.preventDefault();joinByCode($('oCode').value);};
+$('oCode').oninput=e=>{const v=cleanCode(e.target.value);if(e.target.value!==v)e.target.value=v;};
+$('oBack').onclick=()=>{document.querySelector('.home-card').classList.remove('online-mode');$('hNote').textContent='';};
+$('onlinePill').onclick=()=>copyCode();
+$('onlinePill').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();copyCode();}};
 $('hHelp').onclick=()=>{$('helpBox').hidden=!$('helpBox').hidden;};
 $('homeBtn').onclick=()=>{closeMenu();showHome();};
 
