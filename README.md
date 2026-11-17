@@ -15,3 +15,7 @@ Controles: um dedo usa a ferramenta selecionada; dois dedos movem e dão zoom.
 No computador: botão direito ou ferramenta "Mover" para arrastar, roda do mouse para zoom, WASD/setas, espaço pausa.
 
 `game.html` é a fonte; rode `./build.sh` para gerar `index.html`.
+
+## queres.games
+
+`./build-site.sh` gera `site/` (página + fonte Outfit guardada, sem Google Fonts) para copiar em `public/jogar/horizonte/` do site.

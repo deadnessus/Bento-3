@@ -970,7 +970,7 @@ const cleanCode=v=>(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/[IO]/
 async function openOnlinePanel(){
   const note=$('hNote');note.textContent='';
   const db=await getDb();
-  if(!db){note.textContent='O modo online só funciona abrindo o jogo pelo link do Claude, com sua conta.';return;}
+  if(!db){note.textContent=window.claude?'O modo online não abriu agora. Tente de novo daqui a pouco.':'O modo online ainda não chegou nesta versão do jogo. Em breve!';return;}
   userP=userP||useCap('user');const user=await userP;
   ON.canWrite=true;if(user){const w=await user.can('data.write');if(w===false)ON.canWrite=false;}
   $('oCreate').disabled=!ON.canWrite;
